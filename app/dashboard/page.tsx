@@ -172,7 +172,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-zinc-100 flex flex-row overflow-x-hidden selection:bg-indigo-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08090d] text-slate-900 dark:text-zinc-100 flex flex-row overflow-x-hidden selection:bg-indigo-600 selection:text-white transition-colors duration-200">
       {/* Desktop Collapsible Sidebar */}
       <div className="hidden lg:block shrink-0 sticky top-0 h-screen">
         <Sidebar
@@ -193,13 +193,13 @@ export default function DashboardPage() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative z-50 flex flex-col w-72 max-w-[85vw] h-full bg-[#0d0f18] shadow-2xl">
+          <div className="relative z-50 flex flex-col w-72 max-w-[85vw] h-full bg-white dark:bg-[#0d0f18] shadow-2xl">
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-white/[0.06] text-zinc-400 hover:text-white"
+              className="absolute top-4 right-4 z-40 p-2 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -237,9 +237,9 @@ export default function DashboardPage() {
 
         {/* Demo banner if not signed in */}
         {!user && !isLoading && (
-          <div className="bg-gradient-to-r from-indigo-950/70 via-purple-950/60 to-indigo-950/70 border-b border-indigo-500/20 px-4 sm:px-6 py-2 flex items-center justify-between text-xs text-indigo-200">
+          <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-indigo-950/70 dark:via-purple-950/60 dark:to-indigo-950/70 border-b border-indigo-200 dark:border-indigo-500/20 px-4 sm:px-6 py-2 flex items-center justify-between text-xs text-indigo-900 dark:text-indigo-200">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
+              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span>
                 <strong>Dashboard Preview Mode</strong>: You are exploring the dashboard layout with simulated data.
               </span>

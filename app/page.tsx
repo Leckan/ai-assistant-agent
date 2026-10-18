@@ -15,7 +15,7 @@ import { Footer } from "./components/Footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#08090d] text-zinc-100 flex flex-col selection:bg-indigo-600 selection:text-white">
+    <div className="landing-page min-h-screen bg-slate-50 dark:bg-[#08090d] text-slate-900 dark:text-zinc-100 flex flex-col selection:bg-indigo-600 selection:text-white transition-colors duration-200">
       {/* Sticky Glass Navbar */}
       <Navbar />
 

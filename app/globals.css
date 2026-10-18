@@ -1,10 +1,76 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #08090d;
-  --foreground: #f3f4f6;
-  --card-bg: rgba(18, 20, 29, 0.7);
-  --card-border: rgba(255, 255, 255, 0.08);
+  /* Light & Dark design tokens */
+  --bg-light: #f8fafc;
+  --bg-dark: #08090d;
+  --fg-light: #0f172a;
+  --fg-dark: #f3f4f6;
+  --accent-light: #4f46e5;
+  --accent-dark: #818cf8;
+  --scrollbar-track-light: #f1f5f9;
+  --scrollbar-track-dark: #08090d;
+  --scrollbar-thumb-light: #cbd5e1;
+  --scrollbar-thumb-dark: #1f2438;
+
+  --background: var(--bg-light);
+  --foreground: var(--fg-light);
+  --accent-color: var(--accent-light);
+  --scrollbar-track: var(--scrollbar-track-light);
+  --scrollbar-thumb: var(--scrollbar-thumb-light);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(15, 23, 42, 0.08);
+
+  /* Fallback for browsers without light-dark() support */
+  @media (prefers-color-scheme: dark) {
+    --background: var(--bg-dark);
+    --foreground: var(--fg-dark);
+    --accent-color: var(--accent-dark);
+    --scrollbar-track: var(--scrollbar-track-dark);
+    --scrollbar-thumb: var(--scrollbar-thumb-dark);
+    --card-bg: rgba(18, 20, 29, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Modern light-dark() function support */
+  @supports (color: light-dark(white, black)) {
+    --background: light-dark(var(--bg-light), var(--bg-dark));
+    --foreground: light-dark(var(--fg-light), var(--fg-dark));
+    --accent-color: light-dark(var(--accent-light), var(--accent-dark));
+    --scrollbar-track: light-dark(var(--scrollbar-track-light), var(--scrollbar-track-dark));
+    --scrollbar-thumb: light-dark(var(--scrollbar-thumb-light), var(--scrollbar-thumb-dark));
+  }
+
+  /* Automatically adapt native browser UI to system or user override */
+  color-scheme: light dark;
+  accent-color: var(--accent-color);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+  &:has(> head > meta[name="color-scheme"][content="dark"]),
+  &.dark {
+    color-scheme: dark;
+    --background: var(--bg-dark);
+    --foreground: var(--fg-dark);
+    --accent-color: var(--accent-dark);
+    --scrollbar-track: var(--scrollbar-track-dark);
+    --scrollbar-thumb: var(--scrollbar-thumb-dark);
+    --card-bg: rgba(18, 20, 29, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
+  }
+
+  &:has(> head > meta[name="color-scheme"][content="light"]),
+  &.light {
+    color-scheme: light;
+    --background: var(--bg-light);
+    --foreground: var(--fg-light);
+    --accent-color: var(--accent-light);
+    --scrollbar-track: var(--scrollbar-track-light);
+    --scrollbar-thumb: var(--scrollbar-thumb-light);
+    --card-bg: rgba(255, 255, 255, 0.88);
+    --card-border: rgba(15, 23, 42, 0.08);
+  }
 }
 
 @theme inline {
@@ -16,7 +82,6 @@
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
 }
 
 body {
@@ -24,8 +89,6 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
-  selection-background-color: #6366f1;
-  selection-color: #ffffff;
 }
 
 ::selection {
@@ -36,55 +99,140 @@ body {
 /* Background Grids & Atmospheric Glows */
 .bg-grid-white {
   background-size: 36px 36px;
-  background-image: 
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+}
+
+.dark .bg-grid-white {
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
 .bg-dots-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(15, 23, 42, 0.1) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
+.dark .bg-dots-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+}
+
 .glass-panel {
-  background: rgba(15, 17, 26, 0.75);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.05);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 17, 26, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
 
 .glass-panel-hover {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .glass-panel-hover:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.15);
+}
+
+.dark .glass-panel-hover:hover {
   background: rgba(23, 26, 40, 0.85);
   border-color: rgba(99, 102, 241, 0.3);
   box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.15);
 }
 
 .gradient-text {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .gradient-text {
   background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-accent {
+  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .gradient-accent {
   background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Custom subtle scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Code and terminal blocks maintain dark color-scheme per modern-web-guidance */
+pre,
+code {
+  color-scheme: dark;
+  accent-color: var(--accent-color);
 }
-::-webkit-scrollbar-track {
-  background: #08090d;
+
+/* Landing page Light Mode adaptations */
+html.light .landing-page section,
+html.light .landing-page footer {
+  border-color: rgba(15, 23, 42, 0.08);
 }
-::-webkit-scrollbar-thumb {
-  background: #1f2438;
-  border-radius: 4px;
+
+html.light .landing-page :is(h1, h2, h3, h4).text-white {
+  color: #0f172a;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #31395b;
+
+html.light .landing-page .text-zinc-200 {
+  color: #1e293b;
+}
+
+html.light .landing-page .text-zinc-300 {
+  color: #334155;
+}
+
+html.light .landing-page .text-zinc-400 {
+  color: #475569;
+}
+
+html.light .landing-page .text-zinc-500 {
+  color: #64748b;
+}
+
+html.light .landing-page :is(.bg-\[\#08090d\], .bg-\[\#0a0c12\], .bg-\[\#0b0d14\]) {
+  background-color: #f8fafc;
+}
+
+html.light .landing-page :is(.bg-\[\#0d0f18\], .bg-\[\#0e101a\], .bg-\[\#121524\]) {
+  background-color: #ffffff;
+}
+
+html.light .landing-page :is(.bg-black\/30, .bg-black\/40, .bg-black\/50) {
+  background-color: #f1f5f9;
+}
+
+html.light .landing-page :is(.border-white\/\[0\.06\], .border-white\/\[0\.08\], .border-white\/\[0\.1\], .border-white\/\[0\.12\]) {
+  border-color: rgba(15, 23, 42, 0.09);
+}
+
+/* Legacy fallback for WebKit/Blink browsers that do not support scrollbar-color */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
 }

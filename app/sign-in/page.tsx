@@ -10,21 +10,24 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   CheckCircle2,
   Loader2,
   ShieldCheck,
   Zap,
   Phone,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 import { PhoneAuthForm } from "@/app/components/PhoneAuthForm";
 
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signInWithPassword, signInWithGoogle, verifyOtp, instantVerify, isLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
 
@@ -36,20 +39,17 @@ function SignInContent() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Verification code modal/step if unverified
   const [needsVerification, setNeedsVerification] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   useEffect(() => {
-    // If already logged in, redirect to dashboard or home
     if (user && !isLoading) {
       router.push("/dashboard");
     }
   }, [user, isLoading, router]);
 
   useEffect(() => {
-    // Check url search parameters (e.g. after email verification or error redirects)
     const status = searchParams.get("insforge_status");
     const errorParam = searchParams.get("insforge_error");
     const verifiedParam = searchParams.get("verified");
@@ -85,7 +85,6 @@ function SignInContent() {
       const err = result.error || "Failed to sign in";
       setErrorMsg(err);
 
-      // If user is unverified, offer the verification prompt
       if (err.toLowerCase().includes("verify") || err.toLowerCase().includes("forbidden")) {
         setNeedsVerification(true);
       }
@@ -129,7 +128,6 @@ function SignInContent() {
     setErrorMsg(null);
     const res = await instantVerify(email);
     if (res.success) {
-      // Now auto-sign in
       const signRes = await signInWithPassword(email, password);
       setVerifyingOtp(false);
       if (signRes.success) {
@@ -146,7 +144,24 @@ function SignInContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-zinc-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden selection:bg-indigo-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08090d] text-slate-900 dark:text-zinc-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden selection:bg-indigo-600 selection:text-white transition-colors duration-200">
+      {/* Top-right Theme Toggle */}
+      <div className="absolute top-5 right-5 z-20">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2.5 rounded-xl bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.1] text-slate-600 dark:text-zinc-300 shadow-xs transition-colors"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-indigo-600" />
+          )}
+        </button>
+      </div>
+
       {/* Background Gradients & Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-b from-indigo-600/15 via-violet-600/10 to-transparent blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-20 right-10 w-[500px] h-[350px] bg-cyan-600/10 blur-[100px] pointer-events-none" />
@@ -155,29 +170,29 @@ function SignInContent() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
         <Link href="/" className="inline-flex items-center gap-3 group mb-6">
           <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-cyan-400 p-[1px] shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-shadow">
-            <div className="w-full h-full bg-[#0d0f18] rounded-[15px] flex items-center justify-center">
+            <div className="w-full h-full bg-slate-950 dark:bg-[#0d0f18] rounded-[15px] flex items-center justify-center">
               <Bot className="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform" />
             </div>
           </div>
-          <span className="text-2xl font-bold tracking-tight text-white">
-            Omni<span className="text-indigo-400">Mind</span>
+          <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Omni<span className="text-indigo-600 dark:text-indigo-400">Mind</span>
           </span>
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Welcome back
         </h1>
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="mt-2 text-sm text-slate-600 dark:text-zinc-400">
           Sign in to your unified assistant & connected inbox
         </p>
       </div>
 
       {/* Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-white/[0.08] backdrop-blur-xl relative">
+        <div className="glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-xl relative">
           {/* Notifications */}
           {errorMsg && (
-            <div className="mb-5 flex items-start gap-3 p-3.5 text-sm text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-xl animate-in fade-in">
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+            <div className="mb-5 flex items-start gap-3 p-3.5 text-sm text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 rounded-xl animate-in fade-in">
+              <AlertCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <span>{errorMsg}</span>
               </div>
@@ -185,22 +200,22 @@ function SignInContent() {
           )}
 
           {successMsg && (
-            <div className="mb-5 flex items-start gap-3 p-3.5 text-sm text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 rounded-xl animate-in fade-in">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="mb-5 flex items-start gap-3 p-3.5 text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-500/30 rounded-xl animate-in fade-in">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* Method Selector Tabs */}
           {!needsVerification && (
-            <div className="flex rounded-xl bg-black/40 p-1 border border-white/[0.08] mb-6">
+            <div className="flex rounded-xl bg-slate-100 dark:bg-black/40 p-1 border border-slate-200 dark:border-white/[0.08] mb-6">
               <button
                 type="button"
                 onClick={() => setAuthMethod("email")}
                 className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
                   authMethod === "email"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                    : "text-zinc-400 hover:text-white"
+                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <Mail className="w-3.5 h-3.5" />
@@ -212,7 +227,7 @@ function SignInContent() {
                 className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
                   authMethod === "phone"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                    : "text-zinc-400 hover:text-white"
+                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <Phone className="w-3.5 h-3.5" />
@@ -226,16 +241,16 @@ function SignInContent() {
           ) : needsVerification ? (
             /* Email OTP Verification Sub-Flow */
             <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="text-center p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-3">
-                <ShieldCheck className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                <h3 className="text-sm font-semibold text-amber-300">Email Verification Required</h3>
-                <p className="text-xs text-zinc-400 mt-1">
-                  We need to verify <strong className="text-zinc-200">{email}</strong> before you can access your account.
+              <div className="text-center p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 mb-3">
+                <ShieldCheck className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto mb-2" />
+                <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-300">Email Verification Required</h3>
+                <p className="text-xs text-slate-600 dark:text-zinc-400 mt-1">
+                  We need to verify <strong className="text-slate-900 dark:text-zinc-200">{email}</strong> before you can access your account.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">
+                <label className="block text-xs font-medium uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   6-Digit Verification Code
                 </label>
                 <input
@@ -244,7 +259,7 @@ function SignInContent() {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                   placeholder="123456"
-                  className="w-full text-center tracking-[0.3em] font-mono text-xl py-3 px-4 rounded-xl bg-black/40 border border-white/[0.1] text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="w-full text-center tracking-[0.3em] font-mono text-xl py-3 px-4 rounded-xl bg-white dark:bg-black/40 border border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -271,16 +286,16 @@ function SignInContent() {
                   type="button"
                   onClick={handleInstantVerify}
                   disabled={verifyingOtp}
-                  className="w-full py-2 px-3 text-xs font-mono text-cyan-300 bg-cyan-950/30 border border-cyan-500/30 rounded-xl hover:bg-cyan-950/60 transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full py-2 px-3 text-xs font-mono text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-500/30 rounded-xl hover:bg-cyan-100 dark:hover:bg-cyan-950/60 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                  <Zap className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                   <span>Instant Verify (Test Mode / 1-Click)</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setNeedsVerification(false)}
-                  className="text-xs text-zinc-400 hover:text-zinc-200 text-center py-1"
+                  className="text-xs text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 text-center py-1"
                 >
                   Back to password sign in
                 </button>
@@ -295,12 +310,11 @@ function SignInContent() {
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={googleLoading || submitting}
-                  className="w-full py-3 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/[0.1] border border-white/[0.12] hover:border-white/[0.22] text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-3 group relative shadow-md"
+                  className="w-full py-3 px-4 rounded-xl bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.08] active:bg-slate-100 dark:active:bg-white/[0.1] border border-slate-300 dark:border-white/[0.12] hover:border-slate-400 dark:hover:border-white/[0.22] text-slate-900 dark:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-3 group relative shadow-xs"
                 >
                   {googleLoading ? (
-                    <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 animate-spin" />
                   ) : (
-                    /* Google SVG Logo */
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
@@ -326,21 +340,21 @@ function SignInContent() {
 
               {/* Divider */}
               <div className="relative flex items-center justify-center">
-                <div className="border-t border-white/[0.08] w-full" />
-                <span className="bg-[#0e101a] px-3 text-xs font-mono uppercase text-zinc-500 tracking-wider">
+                <div className="border-t border-slate-200 dark:border-white/[0.08] w-full" />
+                <span className="bg-white dark:bg-[#0e101a] px-3 text-xs font-mono uppercase text-slate-400 dark:text-zinc-500 tracking-wider shrink-0">
                   or sign in with email
                 </span>
-                <div className="border-t border-white/[0.08] w-full" />
+                <div className="border-t border-slate-200 dark:border-white/[0.08] w-full" />
               </div>
 
               {/* Email & Password Form */}
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-1.5">
+                  <label className="block text-xs font-medium uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                     Email address
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500">
                       <Mail className="w-4 h-4" />
                     </div>
                     <input
@@ -349,19 +363,19 @@ function SignInContent() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@domain.com"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400">
+                    <label className="block text-xs font-medium uppercase tracking-wider text-slate-600 dark:text-zinc-400">
                       Password
                     </label>
                   </div>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500">
                       <Lock className="w-4 h-4" />
                     </div>
                     <input
@@ -370,12 +384,12 @@ function SignInContent() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-black/40 border border-white/[0.1] text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white dark:bg-black/40 border border-slate-300 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-500 hover:text-zinc-300"
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -404,12 +418,12 @@ function SignInContent() {
           )}
 
           {/* Footer link to Sign Up */}
-          <div className="mt-6 pt-5 border-t border-white/[0.08] text-center">
-            <p className="text-xs text-zinc-400">
+          <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/[0.08] text-center">
+            <p className="text-xs text-slate-500 dark:text-zinc-400">
               Don&apos;t have an account?{" "}
               <Link
                 href="/sign-up"
-                className="font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-4"
+                className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 underline underline-offset-4"
               >
                 Sign up free
               </Link>
@@ -421,7 +435,7 @@ function SignInContent() {
         <div className="mt-6 text-center">
           <Link
             href="/"
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors inline-flex items-center gap-1.5"
+            className="text-xs text-slate-500 dark:text-zinc-500 hover:text-slate-800 dark:hover:text-zinc-300 transition-colors inline-flex items-center gap-1.5"
           >
             ← Back to OmniMind AI
           </Link>
@@ -435,7 +449,7 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#08090d] flex items-center justify-center text-zinc-500">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#08090d] flex items-center justify-center text-slate-500 dark:text-zinc-500">
           <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
         </div>
       }
