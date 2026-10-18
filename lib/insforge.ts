@@ -33,6 +33,7 @@ export interface UserRecord {
   avatar_url: string | null;
   providers: string[] | null;
   email_verified: boolean;
+  integrations?: any[] | null;
   created_at: string;
   last_login_at?: string | null;
   updated_at: string;
@@ -249,3 +250,130 @@ export async function savePhoneUserToDatabase(params: {
     return { data: null, error: errorObj, isFirstTime: false };
   }
 }
+
+export interface UserIntegrationRecord {
+  id?: string;
+  user_id: string;
+  platform_id: string;
+  status: "connected" | "disconnected";
+  connected_account?: string | null;
+  last_synced?: string | null;
+  latency_ms?: number;
+  settings?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Fetch all platform connection states for a user from the InsForge database `user_integrations` table.
+ */
+export async function fetchUserIntegrations(
+  userId: string
+): Promise<{ data: UserIntegrationRecord[] | null; error: Error | null }> {
+  try {
+    if (!userId) {
+      return { data: [], error: null };
+    }
+
+    const { data, error } = await insforge.database
+      .from("user_integrations")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.warn("fetchUserIntegrations database error:", error);
+      return { data: null, error: new Error(error.message) };
+    }
+
+    return { data: (data as UserIntegrationRecord[]) || [], error: null };
+  } catch (err: unknown) {
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    console.error("fetchUserIntegrations error:", errorObj);
+    return { data: null, error: errorObj };
+  }
+}
+
+/**
+ * Persist or update a platform connection state into the InsForge database `user_integrations` table.
+ */
+export async function persistUserIntegration(
+  userId: string,
+  integration: {
+    platform_id: string;
+    status: "connected" | "disconnected";
+    connected_account?: string | null;
+    last_synced?: string | null;
+    latency_ms?: number;
+    settings?: Record<string, any>;
+  }
+): Promise<{ data: UserIntegrationRecord | null; error: Error | null }> {
+  try {
+    if (!userId || !integration.platform_id) {
+      return { data: null, error: new Error("Missing userId or platform_id") };
+    }
+
+    const nowIso = new Date().toISOString();
+    const payload = {
+      user_id: userId,
+      platform_id: integration.platform_id,
+      status: integration.status,
+      connected_account: integration.connected_account ?? null,
+      last_synced:
+        integration.last_synced ??
+        (integration.status === "connected" ? "Just now" : "Disconnected"),
+      latency_ms: integration.latency_ms ?? 0,
+      settings: integration.settings ?? {},
+      updated_at: nowIso,
+    };
+
+    // Check if record exists for (user_id, platform_id)
+    const { data: existingRows, error: selectError } = await insforge.database
+      .from("user_integrations")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("platform_id", integration.platform_id);
+
+    if (selectError) {
+      console.warn("Select error on user_integrations:", selectError);
+    }
+
+    if (existingRows && existingRows.length > 0) {
+      // Update existing record
+      const { data: updated, error: updateError } = await insforge.database
+        .from("user_integrations")
+        .update(payload)
+        .eq("user_id", userId)
+        .eq("platform_id", integration.platform_id)
+        .select();
+
+      if (updateError) {
+        return { data: null, error: new Error(updateError.message) };
+      }
+
+      return {
+        data: updated && updated.length > 0 ? (updated[0] as UserIntegrationRecord) : null,
+        error: null,
+      };
+    } else {
+      // Insert new record
+      const { data: inserted, error: insertError } = await insforge.database
+        .from("user_integrations")
+        .insert([{ ...payload, created_at: nowIso }])
+        .select();
+
+      if (insertError) {
+        return { data: null, error: new Error(insertError.message) };
+      }
+
+      return {
+        data: inserted && inserted.length > 0 ? (inserted[0] as UserIntegrationRecord) : null,
+        error: null,
+      };
+    }
+  } catch (err: unknown) {
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    console.error("persistUserIntegration error:", errorObj);
+    return { data: null, error: errorObj };
+  }
+}
+

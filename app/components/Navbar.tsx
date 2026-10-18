@@ -66,12 +66,12 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-sm font-medium text-slate-600 dark:text-zinc-300">
-            <a
-              href="#channels"
+            <Link
+              href="/integrations"
               className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
             >
               Integrations
-            </a>
+            </Link>
             <a
               href="#simulator"
               className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5"
@@ -201,13 +201,13 @@ export function Navbar() {
               <span className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
               <span>Syncing 4 Channels: Gmail • WhatsApp • TG • Outlook</span>
             </div>
-            <a
-              href="#channels"
+            <Link
+              href="/integrations"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-lg text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] text-sm font-medium"
             >
-              Integrations (Gmail, WhatsApp, TG, Outlook)
-            </a>
+              Integrations & MCP Tools
+            </Link>
             <a
               href="#simulator"
               onClick={() => setMobileMenuOpen(false)}

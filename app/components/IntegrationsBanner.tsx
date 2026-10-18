@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Mail,
   MessageCircle,
@@ -196,13 +197,13 @@ export function IntegrationsBanner() {
                 <div className="text-xs text-zinc-400 font-mono">
                   Setup time: <strong className="text-white">Under 60 seconds</strong>
                 </div>
-                <a
-                  href="#pricing"
+                <Link
+                  href="/integrations"
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
                   Connect {currentIntegration.name} Now
                   <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               </div>
             </div>
 
