@@ -29,6 +29,7 @@ export interface PlatformIntegration {
   connectedAccount?: string;
   lastSynced?: string;
   latencyMs?: number;
+  settings?: Record<string, any>;
   tools: McpToolDefinition[];
 }
 
@@ -43,13 +44,10 @@ export const PLATFORM_INTEGRATIONS: PlatformIntegration[] = [
       "Automated inbox zero triage, thread digests, and AI drafts."
     ],
     category: "Email",
-    mcpServerName: "gmail-mcp-server",
-    mcpVersion: "1.4.2",
-    protocolVersion: "2024-11-05",
-    status: "connected",
-    connectedAccount: "alex.mercer@omnimind.ai",
-    lastSynced: "Just now",
-    latencyMs: 82,
+    mcpServerName: "https://gmailmcp.googleapis.com/mcp/v1",
+    mcpVersion: "v1 (Google Official)",
+    protocolVersion: "2024-11-05 (OAuth 2.0)",
+    status: "disconnected",
     tools: [
       {
         name: "gmail_list_messages",
